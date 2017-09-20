@@ -1,0 +1,177 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>无标题文档</title>
+<script>
+ var effect=(function(){
+	 var slider=function(o){
+		 this.setting=typeof o==='object'?o:{};
+		 this.target=this.setting.target||'slider';
+		 this.showMarkers=this.setting.showMarkers||false;
+		 this.showcontrols=this.setting.showcontrols||false;
+		 this.timer=null;
+		 this.currenttime=null;
+		 this.ms=35;
+		 this.automs=3000;
+		 this.itarget=0;
+		 this.nexttarget=0;
+		 this.speed=0;
+		 this.init();
+		 this.handleevent();
+	 };
+	 slider.paototype={
+		 init:function(){
+			 this.obj=document.getElementById(this.target);
+			 this.oul=this.obj.getelmentbytagname('ul')[0];
+			 this.auilis=this.oul.getelementsbytagname('li');
+			 this.width=this.auilis[0].offsetwidth;
+			 this.number=this.auils.length;
+			 this.oui.style.width=this.width*this.number+'px';
+			 if(this.showmarkers){
+				 var odiv=document.createElement('div');
+				 var alis=[];
+				 for(var i=0;i<this.number;i++){
+					 alis.push('<li>'+(i+1)+'<\/li>');
+				 }
+				 odiv.innerhtml='<ol>'+alis.join('')+'<\/ol>';
+				 this.obj.appendchild(odiv.firstchild);
+				 this.alis=this.obj.getelementsbytagname('ol')[0].getelementsbytagname('li');
+				 this.alis[0].classname='active';
+				 odiv=null;
+			 }
+			 if(this.showcontrols){
+				 this.oprev=document.createElement('p');
+				 this.onext=document.createElement('p');
+				 this.oprev.classname='prev';
+				 this.oprev.innerhtml='&laquo';
+				 this.onext.classname='next';
+				 this.onext.innerhtml='&raquo;';
+				 this.obj.appendchild(this.oprev);
+				 this.obj.appendchild(this.onext);
+			 }
+		 },
+		 handleevent;function(){
+			 var that=this;
+			 this.currenttime=setinterval(function(){
+				 that.autoplay();
+			 },this.automs0;
+			 this.addevent(this.obj,'mouseover',function(){
+				 clearinterval(that.obj,'mouseover',function(){
+					 that.autoplay();
+				 },this.automs);
+				 this,addevent(this,obj,'mouseover',function(){
+					 clearinterval(that.currenttime);
+				 });
+				 this.addevent(this.obj.'mouseout',function(){
+					 that.currenttime=setinterval(function(){
+						 that.autoplay();
+					 },that.automs);
+				 });
+				 if(this.showmarkers){
+					 for(var i=0;i<this.number;i++){
+						 var el=this.alis[i];
+						 (function(index){
+							 that.addevent(el.'mouseover',function(){
+								 that.gotime(index);
+							 });
+						 })(i);
+					 }
+				 }
+				 if(this.showcontrols){
+					 this.addevent(this.oprev,'click',function(){
+						 that.fnprev();
+					 });
+					 this.addevent(this.onext,'click',function(){
+						 that.autoplat();
+					 });
+				 }
+			 },
+			 addevent:function(el,type,fn){
+				 if(window.addEventListener){
+					 el.addeventlistener(type,fnfalse);
+				 }
+				 elae if(window.attachevent){
+					 el.attachevent('on'+type,fn);
+				 }
+			 },
+			 fnfrev:function(){
+				 this.nexttarget--;
+				 if(this.nexttarget=this.number-1;
+				 }
+				 this.gotime(this.nexttarget);
+		 },
+		 autoplay:function(){
+			 this.nexttarget++;
+			 if(this.nexttarget>=this.number){
+				 this.nexttarget=0;
+			 }
+			 this.gotime(this.nexttarget);
+		 },
+		 gotime:function(index){
+			 for(var i=0;i<this.nuber;i++){
+				 i==index?this.alis[i].classname='active';this.alis[i].classname='';
+			 }
+		 }
+		 this.itarget=-index*this.width;
+		 if(this.timer){
+			 clearinterval(this.timer);
+		 }
+		 this.time=setinterval(function){
+			 that.domove(that.itarget);
+		 },this.ms);
+	 },
+	 domove:function(target){
+		 this.timer=setinterval(function(){
+			 that.domove(that.itarget);
+		 },this.ms);
+	 },
+	 domove:function(target){
+		 this.oul.style.left=this.speed+'px';
+		 this.speed+=(target-this.oul.offsetleft)/3;
+		 if(math.abs(target-this.oul.offsetleft)===0){
+			 this.oul.style.left=target+'px';
+			 clearinterval(this.timer);
+			 this.time=null;
+		 }
+	 }
+ };
+ return{
+	 slider:function(o){
+		 var tt=new slider(o);
+	 }
+ };
+ })();
+ effect.slider({
+	 'targetelement':'slider',
+	 'showmargets':true,
+	 'showcontrols':true
+ });
+ 
+		 
+		 
+				 
+						 
+                		 
+</script>
+</head>
+
+<body>
+<div class="case">
+ <div id="slider" class="case_box">
+  <ul>
+   <li class="case_1"><a href="#"><img src="图1.jpg"/></a></li>
+   <li alass="case_2"><a href="#"><img src="图2.jpg"/></a></li>
+   <li class="case_3"><a href="#"><img src="图3.jpg"/></a></li>
+   <li class="case_4"><a href="#"><img src="图4.jpg"/></a></li>
+   <li class="case_5"><a href="#"><img src="图5.jpg"/></a></li>
+   <li class="case_6"><a href="#"><img src="图6.jpg"/></a></li>
+   <li class="case_7"><a href="#"><img src="图7.jpg"/></a></li>
+   <li class="case_8"><a href="#"><img src="图8.jpg"/></a></li>
+   <li class="case_9"><a href="#"><img src="图9.jpg"/></a></li>
+   <li class="case_10"><a href="#"><img src="图10.jpg"/></a></li>
+  </ul>
+ </div>
+</div>
+</body>
+</html>
