@@ -727,3 +727,255 @@
     //    })
 </script>
 ```
+
+## 20170920 del code temp save
+
+```
+    $(function(){
+        var columnsArry = [];
+        $.ajax({
+            url:"/watchpointController/getWatchpointListColumn.do",
+            type:"post",
+            async: false,
+            data:"",
+            dataType:"json",
+            success:function(data){
+                var allTitle = [];
+                data.forEach(function(title){
+                    var colObjet = {
+                        title:title.columnzh,
+                        sortable:true
+                    };
+                    allTitle.push(title.columnzh);
+                    columnsArry.push(colObjet);
+                });
+                $.ajax({
+                    url:"/watchpointController/getWatchpointUserListColumn.do",
+                    type:"post",
+                    async:false,
+                    data:"",
+                    dataType:"json",
+                    success:function(udata){
+                        var userTitle = [];
+                        udata.forEach(function(title){
+                            userTitle.push(title.columnzh)
+                        });
+                        for(var i=0;i<allTitle.length;i++){
+                            for(var j=0;j<userTitle.length;j++){
+                                if(allTitle[i]==userTitle[j]){
+                                    allTitle.splice(i,1)
+                                }
+                            }
+                        }
+                        for(var i=0;i<columnsArry.length;i++){
+                            for(var j=0;j<allTitle.length;j++){
+                                if(columnsArry[i].title==allTitle[j]){
+                                    columnsArry[i].visible=false;
+                                }
+                            }
+                        }
+                        $("#table7").bootstrapTable({
+                            toggle:"table",
+                            url:"/watchpointController/getWatchpointListColumn.do",
+                            toolbar:"#btnAddRemove",
+                            height:"360",
+                            pagination:true,
+                            showColumns:true,
+                            columns:columnsArry
+                        });
+                    }
+                });
+            }
+        });
+        /*-------------用户操作列的消失隐藏--------------------------*/
+        $(document).on('click','button[data-toggle="dropdown"]',function(){
+            if($(this).attr("aria-label")=="columns"){
+                $(this).siblings(".dropdown-menu").find("input[type='checkbox']").click(function(){
+                    if($(this).attr("checked")){
+                        $(this).attr("checked",false)
+                    }else {
+                        $(this).attr("checked",true)
+                    }
+                    var length = $(this).parent().parent().parent().find("input[type='checkbox']").length,
+                            textArr = [];
+                    for(var i= 0;i<length;i++){
+                        if($(this).parent().parent().parent().find("input[type='checkbox']").eq(i).attr("checked")){
+                            textArr.push($.trim($(this).parent().parent().parent().find("input[type='checkbox']").eq(i).parent().text()));
+                        }
+                    }
+                    var idArry = [];
+                    $.ajax({
+                        url:"/watchpointController/getWatchpointListColumn.do",
+                        type:"post",
+                        data:"",
+                        dataType:"json",
+                        success:function(data){
+                            data.forEach(function(item){
+                                textArr.forEach(function(textem){
+                                    if(item.columnzh==textem){
+                                        idArry.push(item.id);
+                                    }
+                                });
+                            });
+                            $.ajax({
+                                url:"/userConfigure/saveUserListColumn.do ",
+                                type:"post",
+                                data:{
+                                    typeId:10,
+                                    columnIds:String(idArry)
+                                },
+                                dataType:"text",
+                                success:function(data){
+                                    console.log(data);
+                                }
+                            })
+                        }
+                    })
+                })
+            }
+        });
+        /*****************左侧图标工具栏************************/
+        $.ajax({
+            url:"authorizeModuleController/getFindAll.do",
+            type:"post",
+            data:"",
+            dataType:"json",
+            success:function(data){
+                data.forEach(function(item,index){
+                    var className;
+                    switch (item.namezh){
+                        case "网络":
+                            className = "sa-side-network";
+                            break;
+                        case "主机":
+                            className = "sa-side-ip";
+                            break;
+                        case "自定义应用":
+                            className = "sa-side-custom";
+                            break;
+                        case "WEB服务":
+                            className = "sa-side-web";
+                            break;
+                        case "ORACLE服务":
+                            className = "sa-side-oracle";
+                            break;
+                        case "MYSQL服务":
+                            className = "sa-side-mysql";
+                            break;
+                        case "SQLSERVER服务":
+                            className = "sa-side-sqlserver";
+                            break;
+                        case "URL交易":
+                            className = "sa-side-url";
+                            break;
+                        case "报文交易":
+                            className = "sa-side-baowenJy";
+                            break;
+                        case "观察点":
+                            className = "sa-side-observationPoint";
+                            break;
+                        case "用户端":
+                            className = "sa-side-userSide";
+                            break;
+                        case "服务端":
+                            className = "sa-side-serverSide";
+                            break;
+                        default:
+                            className = "sa-side-home";
+                            break;
+                    }
+                    if(item.namezh=="观察点"||item.namezh=="服务端"||item.namezh=="用户端"){
+                        if(item.namezh=="观察点"){
+                            var ul = $( '<ul class="list-unstyled menu-item overflowYs">' +
+                                    '</ul>');
+                            $.ajax({
+                                url:"watchpointController/getFindAll.do",
+                                type:"post",
+                                data:"",
+                                dataType:"json",
+                                success:function(data){
+                                    data.forEach(function(item,index){
+                                        $(ul).append('<li class="cursor" style="font-weight: 600;">'+item.name+'</li>')
+                                    })
+                                }
+                            });
+                            var li = $('<li class="dropdown">' +
+                                    '<a class="'+className+'" href="'+className.split("-")[2]+'.html">'+
+                                    '<span class="menu-item">'+item.namezh+ '管理与设置</span>'+
+                                    '</a>'+
+                                    '</li>');
+                            $(li).append(ul);
+                            $("#sidebar>ul").on("click",'.'+className+'+.overflowYs>.cursor',function(){
+                                console.log($(this).text());
+                                if($(this).text()){
+                                    document.cookie ="tValue = "+$(this).text();
+                                    location.href = "observationPointkpi.html";
+                                }
+                            });
+                        }else if(item.namezh=="服务端") {
+                            var ul = $( '<ul class="list-unstyled menu-item overflowYs">' +
+                                    '</ul>');
+                            $.ajax({
+                                url:"/serverManagement/getAllServerSide.do",
+                                type:"post",
+                                data:"",
+                                dataType:"json",
+                                success:function(data){
+                                    data.forEach(function(item,index){
+                                        $(ul).append('<li class="cursor" style="font-weight: 600;">'+item.name+'</li>')
+                                    })
+                                }
+                            });
+                            var li = $('<li class="dropdown">' +
+                                    '<a class="'+className+'" href="'+className.split("-")[2]+'.html">'+
+                                    '<span class="menu-item">'+item.namezh+ '管理与设置</span>'+
+                                    '</a>'+
+                                    '</li>');
+                            $(li).append(ul);
+                            $("#sidebar>ul").on("click",'.'+className+'+.overflowYs>.cursor',function(){
+                                console.log("222success");
+                                console.log($(this).text());
+                                if($(this).text()){
+                                    document.cookie ="tValue = "+$(this).text();
+                                    location.href = "serverSidekpi.html";
+                                }
+                            });
+                        }else {
+                            //用户端
+                            var ul = $( '<ul class="list-unstyled menu-item overflowYs">' +
+                                    '</ul>');
+                            $.ajax({
+                                url:"/client/getClient.do?moduleId=11",
+                                type:"post",
+                                data:"",
+                                dataType:"json",
+                                success:function(data){
+                                    data.forEach(function(item,index){
+                                        $(ul).append('<li class="cursor" style="font-weight: 600;">'+item.name+'</li>')
+                                    })
+                                }
+                            });
+                            var li = $('<li class="dropdown">' +
+                                    '<a class="'+className+'" href="'+className.split("-")[2]+'.html">'+
+                                    '<span class="menu-item">'+item.namezh+ '管理与设置</span>'+
+                                    '</a>'+
+                                    '</li>');
+                            $(li).append(ul);
+                            $("#sidebar>ul").on("click",'.'+className+'+.overflowYs>.cursor',function(){
+                                document.cookie ="tValue = "+$(this).text();
+                                location.href = "userSidekpi.html";
+                            });
+                        }
+                    }else {
+                        var li = $('<li>' +
+                                '<a class="'+className+'" href="#">'+
+                                '<span class="menu-item">'+item.namezh+'</span>'+
+                                '</a>'+
+                                '</li>');
+                    }
+                    $("#sidebar .side-menu").append(li);
+                })
+            }
+        })
+    });
+```
