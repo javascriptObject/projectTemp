@@ -1165,3 +1165,26 @@
         }
         
 ```
+
+
+## 临存变量
+```
+        function fn(rowId){
+            if(!wpArry){
+                var wpArry = [];
+            }
+            if(!wpArry.length&&!rowId){
+                wpArry.push(1);
+            }
+            wpArry.splice(0,1,rowId);
+          /*  if(!wpArry.length){
+                var watchPointId = wpArry.push(rowId);
+            }else {
+            }*/
+            console.log(wpArry);
+        }
+        fn(5);
+        setTimeout(function(){
+            fn(10);
+        },1000)
+```
