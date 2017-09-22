@@ -979,3 +979,188 @@
         })
     });
 ```
+
+###2017/09/22
+
+```
+  function temp(){
+            $.ajax({
+                url:"/watchpointController/getWatchpointUserListColumn.do",
+                type:"post",
+                data:"",
+                dataType:"json",
+                success:function(data){
+                    var columnsArry = [];
+                    data.forEach(function(title){
+                        if(title.columnen!="id"){
+                            var colObjet = {
+                                field:title.columnen,
+                                title:title.columnzh,
+                                sortable:true,
+                                visible:title.checked
+                            };
+                            columnsArry.push(colObjet);
+                        }
+                    });
+                    $("#table7").bootstrapTable({
+                        toggle:"table",
+                        toolbar:"#guanchapoint",
+                        height:"360",
+                        pagination:true,
+                        showColumns:true,
+                        columns:columnsArry
+                    });
+                    $.ajax({
+//                    url:"/commonController/getNpmListRrdData.do",
+                        url:"json/ob.json",
+                        type:"post",
+                        data:{
+                            moduleId:10
+                        },
+                        dataType:"json",
+                        success:function(tdata){
+                            $("#table7").bootstrapTable("load",tdata);
+                        }
+                    })
+                }
+            });
+            /*-------------用户操作列的消失隐藏--------------------------*/
+            $(document).on('click','button[data-toggle="dropdown"]',function(){
+                if($(this).attr("aria-label")=="columns"){
+                    $(this).siblings(".dropdown-menu").find("input[type='checkbox']").click(function(){
+                        if($(this).attr("checked")){
+                            $(this).attr("checked",false)
+                        }else {
+                            $(this).attr("checked",true)
+                        }
+                        var length = $(this).parent().parent().parent().find("input[type='checkbox']").length,
+                                textArr = [];
+                        for(var i= 0;i<length;i++){
+                            if($(this).parent().parent().parent().find("input[type='checkbox']").eq(i).attr("checked")){
+                                textArr.push($.trim($(this).parent().parent().parent().find("input[type='checkbox']").eq(i).parent().text()));
+                            }
+                        }
+                        var idArry = [];
+                        $.ajax({
+                            url:"/watchpointController/getWatchpointUserListColumn.do",
+                            type:"post",
+                            data:"",
+                            dataType:"json",
+                            success:function(data){
+                                data.forEach(function(item){
+                                    textArr.forEach(function(textem){
+                                        if(item.columnzh==textem){
+                                            idArry.push(item.id);
+                                        }
+                                    });
+                                });
+                                $.ajax({
+                                    url:"/watchpointController/updateUserListColumn.do",
+                                    type:"post",
+                                    data:{
+                                        typeId:10,
+                                        columnIds:String(idArry)
+                                    },
+                                    dataType:"text",
+                                    success:function(data){
+                                        console.log(data);
+                                    }
+                                })
+                            }
+                        })
+                    })
+                }
+            });
+
+            function modulkpi(userColumnurl,toolbartem,modolkpiurl,tableId,watchPointId,moduleId,starttime,endtime){
+                $.ajax({
+                    url:userColumnurl,
+                    type:"post",
+                    data:"",
+                    dataType:"json",
+                    success:function(data){
+                        var columnsArry = [];
+                        data.forEach(function(title){
+                            if(title.columnen!="id"){
+                                var colObjet = {
+                                    field:title.columnen,
+                                    title:title.columnzh,
+                                    sortable:true,
+                                    visible:title.checked
+                                };
+                                columnsArry.push(colObjet);
+                            }
+                        });
+                        $(tableId).bootstrapTable({
+                            toggle:"table",
+                            toolbar:toolbartem,
+                            height:"360",
+                            pagination:true,
+                            showColumns:true,
+                            columns:columnsArry
+                        });
+                        $.ajax({
+//                    url:"/commonController/getNpmListRrdData.do",
+                            url:modolkpiurl,
+                            type:"post",
+                            data:{
+                                "moduleId":moduleId,
+                                "watchPointId":watchPointId,
+                                "starttime":starttime,
+                                "endtime":endtime
+                            },
+                            dataType:"json",
+                            success:function(tdata){
+                                $(tableId).bootstrapTable("load",tdata);
+                            }
+                        })
+                    }
+                });
+            }
+            function clickColumn(thisElm,userColumnurl,userColumnUpurl,moduleId){
+                thisElm.siblings(".dropdown-menu").find("input[type='checkbox']").click(function(){
+                    if($(this).attr("checked")){
+                        $(this).attr("checked",false)
+                    }else {
+                        $(this).attr("checked",true)
+                    }
+                    var length = $(this).parent().parent().parent().find("input[type='checkbox']").length,
+                            textArr = [];
+                    for(var i= 0;i<length;i++){
+                        if($(this).parent().parent().parent().find("input[type='checkbox']").eq(i).attr("checked")){
+                            textArr.push($.trim($(this).parent().parent().parent().find("input[type='checkbox']").eq(i).parent().text()));
+                        }
+                    }
+                    var idArry = [];
+                    $.ajax({
+                        url:userColumnurl,
+                        type:"post",
+                        data:"",
+                        dataType:"json",
+                        success:function(data){
+                            console.log(data);
+                            data.forEach(function(item){
+                                textArr.forEach(function(textem){
+                                    if(item.columnzh==textem){
+                                        idArry.push(item.id);
+                                    }
+                                });
+                            });
+                            $.ajax({
+                                url:userColumnUpurl,
+                                type:"post",
+                                data:{
+                                    typeId:moduleId,
+                                    columnIds:String(idArry)
+                                },
+                                dataType:"text",
+                                success:function(data){
+                                    console.log(data);
+                                }
+                            })
+                        }
+                    })
+                })
+            }
+        }
+        ```
