@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+</html>
+<script>
+    function oldcodetempSave(){
+        function temp1(){
+            $(tableId).bootstrapTable({
+                toggle:"table",
+                toolbar:toolbartem,
+                height:"360",
+                pagination:true,
+                showColumns:true,
+                columns:columnsArry
+            });
+            $.ajax({
+//                    url:"/commonController/getNpmListRrdData.do",
+                url:modolkpiurl,
+                async:false,
+                type:"post",
+                data:{
+                    "moduleId":moduleId,
+                    "watchPointId":watchPointId,
+                    "starttime":starttime,
+                    "endtime":endtime
+                },
+                dataType:"json",
+                success:function(tdata){
+                    $(tableId).bootstrapTable("load",tdata);
+                }
+            });
+        }
+        function clickColumntemp(){
+            var length = $(this).parent().parent().parent().find("input[type='checkbox']").length,
+                    textArr = [];
+            for(var i= 0;i<length;i++){
+                if($(this).parent().parent().parent().find("input[type='checkbox']").eq(i).attr("checked")){
+                    textArr.push($.trim($(this).parent().parent().parent().find("input[type='checkbox']").eq(i).parent().text()));
+                }
+            }
+            var idArry = [];
+            $.ajax({
+                url:userColumnurl,
+                type:"post",
+                data:"",
+                dataType:"json",
+                success:function(data){
+                    data.forEach(function(item){
+                        textArr.forEach(function(textem){
+                            if(item.columnzh==textem){
+                                idArry.push(item.id);
+                            }
+                        });
+                    });
+                    $.ajax({
+                        url:userColumnUpurl,
+                        type:"post",
+                        data:{
+                            typeId:moduleId,
+                            columnIds:String(idArry)
+                        },
+                        dataType:"text",
+                        success:function(data){
+                        }
+                    })
+                }
+            })
+        }
+    }
+    function oldcodetempSave(){
+        function temp(){
+            var columnsArry = [];
+            $.ajax({
+                url:"/serverManagement/getServerSideListColumn.do",
+                type:"post",
+                async: false,
+                data:"",
+                dataType:"json",
+                success:function(data){
+                    var allTitle = [];
+                    data.forEach(function(title){
+                        var colObjet = {
+                            title:title.columnzh,
+                            sortable:true
+                        };
+                        allTitle.push(title.columnzh);
+                        columnsArry.push(colObjet);
+                    });
+                    $.ajax({
+                        url:"/serverManagement/getServerSideUserListColumn.do",
+                        type:"post",
+                        async:false,
+                        data:"",
+                        dataType:"json",
+                        success:function(udata){
+                            var userTitle = [];
+                            udata.forEach(function(title){
+                                userTitle.push(title.columnzh)
+                            });
+                            for(var i=0;i<allTitle.length;i++){
+                                for(var j=0;j<userTitle.length;j++){
+                                    if(allTitle[i]==userTitle[j]){
+                                        allTitle.splice(i,1)
+                                    }
+                                }
+                            }
+                            for(var i=0;i<columnsArry.length;i++){
+                                for(var j=0;j<allTitle.length;j++){
+                                    if(columnsArry[i].title==allTitle[j]){
+                                        columnsArry[i].visible=false;
+                                    }
+                                }
+                            }
+                            $("#table7").bootstrapTable({
+                                toggle:"table",
+                                url:"/serverManagement/getServerSideListColumn.do",
+                                toolbar:"#btnAddRemove",
+                                height:"360",
+                                pagination:true,
+                                showColumns:true,
+                                columns:columnsArry
+                            });
+                        }
+                    });
+                }
+            });
+        }
+        function temp1(){
+            $.ajax({
+                url:"/serverManagement/getServerSideUserListColumn.do",
+                type:"post",
+                async: false,
+                data:"",
+                dataType:"json",
+                success:function(data){
+                    var columnsArry = [];
+                    data.forEach(function(title){
+                        var colObjet = {
+                            title:title.columnzh,
+                            sortable:true,
+                            visible:title.checked
+                        };
+                        columnsArry.push(colObjet);
+                    });
+                    $("#table7").bootstrapTable({
+                        toggle:"table",
+                        url:"/serverManagement/getServerSideUserListColumn.do",
+                        height:"360",
+                        pagination:true,
+                        showColumns:true,
+                        columns:columnsArry
+                    });
+                }
+            });
+            /*-------------用户操作列的消失隐藏--------------------------*/
+            $(document).on('click','button[data-toggle="dropdown"]',function(){
+                if($(this).attr("aria-label")=="columns"){
+                    $(this).siblings(".dropdown-menu").find("input[type='checkbox']").click(function(){
+                        if($(this).attr("checked")){
+                            $(this).attr("checked",false)
+                        }else {
+                            $(this).attr("checked",true)
+                        }
+                        var length = $(this).parent().parent().parent().find("input[type='checkbox']").length,
+                                textArr = [];
+                        for(var i= 0;i<length;i++){
+                            if($(this).parent().parent().parent().find("input[type='checkbox']").eq(i).attr("checked")){
+                                textArr.push($.trim($(this).parent().parent().parent().find("input[type='checkbox']").eq(i).parent().text()));
+                            }
+                        }
+                        var idArry = [];
+                        $.ajax({
+                            url:"/serverManagement/getServerSideUserListColumn.do",
+                            type:"post",
+                            data:"",
+                            dataType:"json",
+                            success:function(data){
+                                data.forEach(function(item){
+                                    textArr.forEach(function(textem){
+                                        if(item.columnzh==textem){
+                                            idArry.push(item.id);
+                                        }
+                                    });
+                                });
+                                $.ajax({
+                                    url:"/userConfigure/saveUserListColumn.do ",
+                                    type:"post",
+                                    data:{
+                                        typeId:12,
+                                        columnIds:String(idArry)
+                                    },
+                                    dataType:"text",
+                                    success:function(data){
+                                    }
+                                })
+                            }
+                        })
+                    })
+                }
+            });
+        }
+        function modutemp(){
+            $(tableId).bootstrapTable({
+                toggle:"table",
+                toolbar:toolbartem,
+                height:"360",
+                pagination:true,
+                showColumns:true,
+                columns:columnsArry
+            });
+            $.ajax({
+                url:modolkpiurl,
+                type:"post",
+                data:{
+                    "moduleId":moduleId,
+                    "watchPointId":watchPointId,
+                    "starttime":starttime,
+                    "endtime":endtime
+                },
+                dataType:"json",
+                success:function(tdata){
+                    $(tableId).bootstrapTable("load",tdata);
+                }
+            })
+        }
+        /*------------------用户点击观察点某一行----------------*/
+        $("#table7").on("click-row.bs.table",function(e,row,element){
+            obPointkpi.clickTableRow(null,row.id,element);
+        });
+        /*------------------用户点击服务端某一行----------------*/
+        $("#serverSidekpi").on("click-row.bs.table",function(e,row,element){
+            obPointkpi.clickTableRow("serverSidekpi",
+                    null,
+                    element,
+                    row.id);
+        });
+        function clickColumntemp(){
+            var length = $(this).parent().parent().parent().find("input[type='checkbox']").length,
+                    textArr = [];
+            for(var i= 0;i<length;i++){
+                if($(this).parent().parent().parent().find("input[type='checkbox']").eq(i).attr("checked")){
+                    textArr.push($.trim($(this).parent().parent().parent().find("input[type='checkbox']").eq(i).parent().text()));
+                }
+            }
+            var idArry = [];
+            $.ajax({
+                url:userColumnurl,
+                type:"post",
+                data:"",
+                dataType:"json",
+                success:function(data){
+                    data.forEach(function(item){
+                        textArr.forEach(function(textem){
+                            if(item.columnzh==textem){
+                                idArry.push(item.id);
+                            }
+                        });
+                    });
+                    $.ajax({
+                        url:userColumnUpurl,
+                        type:"post",
+                        data:{
+                            typeId:moduleId,
+                            columnIds:String(idArry)
+                        },
+                        dataType:"text",
+                        success:function(data){
+                        }
+                    })
+                }
+            })
+        }
+    }
+    function oldcodetempSave(){
+        function temp1(){
+            $.ajax({
+                url:"/client/getClientUserListColumn.do",
+                type:"post",
+                async: false,
+                data:"",
+                dataType:"json",
+                success:function(data){
+                    var columnsArry = [];
+                    data.forEach(function(title){
+                        var colObjet = {
+                            title:title.columnzh,
+                            sortable:true,
+                            visible:title.checked
+                        };
+                        columnsArry.push(colObjet);
+                    });
+                    $("#table7").bootstrapTable({
+                        toggle:"table",
+                        url:"/client/getClientUserListColumn.do",
+                        height:"360",
+                        pagination:true,
+                        showColumns:true,
+                        columns:columnsArry
+                    });
+                }
+            });
+            /*-------------用户操作列的消失隐藏--------------------------*/
+            $(document).on('click','button[data-toggle="dropdown"]',function(){
+                if($(this).attr("aria-label")=="columns"){
+                    $(this).siblings(".dropdown-menu").find("input[type='checkbox']").click(function(){
+                        if($(this).attr("checked")){
+                            $(this).attr("checked",false)
+                        }else {
+                            $(this).attr("checked",true)
+                        }
+                        var length = $(this).parent().parent().parent().find("input[type='checkbox']").length,
+                                textArr = [];
+                        for(var i= 0;i<length;i++){
+                            if($(this).parent().parent().parent().find("input[type='checkbox']").eq(i).attr("checked")){
+                                textArr.push($.trim($(this).parent().parent().parent().find("input[type='checkbox']").eq(i).parent().text()));
+                            }
+                        }
+                        var idArry = [];
+                        $.ajax({
+                            url:"/client/getClientUserListColumn.do",
+                            type:"post",
+                            data:"",
+                            dataType:"json",
+                            success:function(data){
+                                data.forEach(function(item){
+                                    textArr.forEach(function(textem){
+                                        if(item.columnzh==textem){
+                                            idArry.push(item.id);
+                                        }
+                                    });
+                                });
+                                $.ajax({
+                                    url:"/userConfigure/updateUserListColumn.do",
+                                    type:"post",
+                                    data:{
+                                        typeId:11,
+                                        columnIds:String(idArry)
+                                    },
+                                    dataType:"text",
+                                    success:function(data){
+                                    }
+                                })
+                            }
+                        })
+                    })
+                }
+            });
+        }
+        function temp(){
+            $.ajax({
+                url:"/commonController/getNpmListRrdDataBySubPath.do",
+                type:"post",
+                data:{
+                    "moduleId":12,
+                    "watchPointId":row.id,
+                    "appBusinessId":2,
+                    "starttime":1505892630,
+                    "endtime":1505960881
+                },
+                dataType:"json",
+                success:function(data){
+                    $("#serverSidekpi").bootstrapTable("load",data);
+                }
+            })
+        }
+        function temp3(){
+            $(tableId).bootstrapTable({
+                toggle:"table",
+                toolbar:toolbartem,
+                height:"360",
+                pagination:true,
+                showColumns:true,
+                columns:columnsArry
+            });
+            $.ajax({
+                url:modolkpiurl,
+                type:"post",
+                data:{
+                    "moduleId":moduleId,
+                    "watchPointId":watchPointId,
+                    "starttime":starttime,
+                    "endtime":endtime
+                },
+                dataType:"json",
+                success:function(tdata){
+                    $(tableId).bootstrapTable("load",tdata);
+                }
+            })
+        }
+        function clicktablerowTemp(){
+            function temp1(){
+                if(!wpArry){
+                    var wpArry = [];
+                }
+                if(!wpArry.length&&!rowId){
+                    $.ajax({
+                        url:"",
+                        type:"post",
+                        data:{},
+                        dataType:"json",
+                        success:function(data){
+                            wpArry.push(data[0].id)
+                        }
+                    })
+                }
+//                var watchPointId = wpArry.splice(0,1,rowId);
+                wpArry.splice(0,1,rowId);
+                var watchPointId = String(wpArry);
+            }
+            function temp(){
+                $.ajax({
+                    url:"commonController/getNpmListRrdData.do",
+                    type:"post",
+                    data:{
+                        "moduleId":11,
+                        "watchPointId":row.id,
+                        "starttime":1505892630,
+                        "endtime":1505960881
+                    },
+                    dataType:"json",
+                    success:function(data){
+                        $("#userSidekpi").bootstrapTable("load",data);
+                    }
+                });
+                $.ajax({
+                    url:"commonController/getNpmListRrdData.do",
+                    type:"post",
+                    data:{
+                        "moduleId":12,
+                        "watchPointId":row.id,
+                        "starttime":1505892630,
+                        "endtime":1505960881
+                    },
+                    dataType:"json",
+                    success:function(data){
+                        $("#serverSidekpi").bootstrapTable("load",data);
+                    }
+                })
+            }
+        }
+        /*------------------用户点击观察点某一行----------------*/
+        $("#table7").on("click-row.bs.table",function(e,row,element){
+            obPointkpi.clickTableRow(null,row.id,element);
+        });
+        /*------------------用户点击用户端某一行----------------*/
+        $("#userSidekpi").on("click-row.bs.table",function(e,row,element){
+            obPointkpi.clickTableRow("userSidekpi",
+                    null,
+                    element,
+                    row.id);
+        });
+        function cliclColumntemp(){
+            var length = $(this).parent().parent().parent().find("input[type='checkbox']").length,
+                    textArr = [];
+            for(var i= 0;i<length;i++){
+                if($(this).parent().parent().parent().find("input[type='checkbox']").eq(i).attr("checked")){
+                    textArr.push($.trim($(this).parent().parent().parent().find("input[type='checkbox']").eq(i).parent().text()));
+                }
+            }
+            var idArry = [];
+            $.ajax({
+                url:userColumnurl,
+                type:"post",
+                data:"",
+                dataType:"json",
+                success:function(data){
+                    data.forEach(function(item){
+                        textArr.forEach(function(textem){
+                            if(item.columnzh==textem){
+                                idArry.push(item.id);
+                            }
+                        });
+                    });
+                    $.ajax({
+                        url:userColumnUpurl,
+                        type:"post",
+                        data:{
+                            typeId:moduleId,
+                            columnIds:String(idArry)
+                        },
+                        dataType:"text",
+                        success:function(data){
+                        }
+                    })
+                }
+            })
+        }
+        function toggleColumn(){
+            /*-------------用户操作列的消失隐藏--------------------------*/
+            $(document).on('click','button[data-toggle="dropdown"]',function(){
+                if($(this).attr("aria-label")=="columns"){
+                    var idWord = $(this).parents(".columns").prev(".bs-bars").children("div").attr("id"),
+                            thisElm = $(this);
+                    switch (idWord){
+                        case "guanchapoint":
+                            obPointkpi.clickColumn(thisElm,
+                                    "/watchpointController/getWatchpointUserListColumn.do",
+                                    "/watchpointController/updateUserListColumn.do",
+                                    10
+                            );
+                            break;
+                        case "userduan":
+                            obPointkpi.clickColumn(thisElm,
+                                    "/client/getClientUserListColumn.do",
+                                    "/userConfigure/updateUserListColumn.do",
+                                    11
+                            );
+                            break;
+                        case "serverduan":
+                            obPointkpi.clickColumn(thisElm,
+                                    "/serverManagement/getServerSideUserListColumn.do",
+                                    "/userConfigure/saveUserListColumn.do",
+                                    12
+                            );
+                            break;
+                    }
+                }
+            });
+        }
+    }
+
+
+</script>
